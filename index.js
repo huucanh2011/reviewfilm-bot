@@ -28,7 +28,7 @@ app.post("/webhook", (req, res) => {
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
       if (webhook_event.message) {
-        handleMessage(sender_psid, webhook_event.message);
+        // handleMessage(sender_psid, webhook_event.message);
       } else if (webhook_event.postback) {
         handlePostback(sender_psid, webhook_event.postback);
       }
@@ -112,17 +112,39 @@ function handleMessage(sender_psid, received_message) {
 }
 
 function handlePostback(sender_psid, received_postback) {
-  console.log("ok");
   let response;
   // Get the payload for the postback
   let payload = received_postback.payload;
 
-  // Set the response based on the postback payload
-  if (payload === "yes") {
-    response = { text: "Thanks!" };
-  } else if (payload === "no") {
-    response = { text: "Oops, try sending another image." };
+  if (payload === "get_started") {
+    response = {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "button",
+          text: "Review film xin chào bạn, bạn cần gì?",
+          buttons: [
+            {
+              type: "postback",
+              title: "Phim mới nhất",
+              payload: "get_new_film",
+            },
+            {
+              type: "postback",
+              title: "Phim hot",
+              payload: "get_hot_film",
+            },
+            {
+              type: "postback",
+              title: "Phim xem nhiều",
+              payload: "get_popular_film",
+            },
+          ],
+        },
+      },
+    };
   }
+
   // Send the message to acknowledge the postback
   callSendAPI(sender_psid, response);
 }
