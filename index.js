@@ -151,6 +151,8 @@ async function handlePostback(sender_psid, received_postback) {
     console.log(url);
 
     const { data, status } = await callerAPI(url);
+    console.log(data);
+
     if (data && status === 200) {
       if (data.length > 0) {
         let elements = fetchGeneric(data);
