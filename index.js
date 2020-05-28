@@ -112,7 +112,7 @@ function handleMessage(sender_psid, received_message) {
   callSendAPI(sender_psid, response);
 }
 
-function handlePostback(sender_psid, received_postback) {
+async function handlePostback(sender_psid, received_postback) {
   let response;
   // Get the payload for the postback
   let payload = received_postback.payload;
@@ -149,7 +149,7 @@ function handlePostback(sender_psid, received_postback) {
   if (payload === "get_new_film") {
     const url = `${PAGE_URL}/api/phim/new`;
     console.log(url);
-    
+
     const { data, status } = await callerAPI(url);
     if (data && status === 200) {
       if (data.length > 0) {
