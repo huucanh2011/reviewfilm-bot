@@ -1,4 +1,5 @@
 "use strict";
+const PAGE_URL = process.env.PAGE_URL;
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 // Imports dependencies and set up http server
 const axios = require("axios"),
@@ -145,6 +146,75 @@ function handlePostback(sender_psid, received_postback) {
     };
   }
 
+  if (payload === "get_new_film") {
+    const url = `${PAGE_URL}/api/phim/new`;
+    const { data, status } = await callerAPI(url);
+    if (data && status === 200) {
+      if (data.length > 0) {
+        let elements = fetchGeneric(data);
+        response = {
+          attachment: {
+            type: "template",
+            payload: {
+              template_type: "generic",
+              elements: elements,
+            },
+          },
+        };
+      } else {
+        response = {
+          text: "Không tìm thấy kết quả!",
+        };
+      }
+    }
+  }
+
+  if (payload === "get_hot_film") {
+    const url = `${PAGE_URL}/api/phim/hot`;
+    const { data, status } = await callerAPI(url);
+    if (data && status === 200) {
+      if (data.length > 0) {
+        let elements = fetchGeneric(data);
+        response = {
+          attachment: {
+            type: "template",
+            payload: {
+              template_type: "generic",
+              elements: elements,
+            },
+          },
+        };
+      } else {
+        response = {
+          text: "Không tìm thấy kết quả!",
+        };
+      }
+    }
+  }
+
+  if (payload === "get_popular_film") {
+    const url = `${PAGE_URL}/api/phim/popular`;
+    const { data, status } = await callerAPI(url);
+    if (data && status === 200) {
+      if (data.length > 0) {
+        let elements = fetchGeneric(data);
+        response = {
+          attachment: {
+            type: "template",
+            payload: {
+              template_type: "generic",
+              elements: elements,
+            },
+          },
+        };
+      } else {
+        response = {
+          text: "Không tìm thấy kết quả!",
+        };
+      }
+    }
+  }
+
   // Send the message to acknowledge the postback
   callSendAPI(sender_psid, response);
 }
@@ -163,3 +233,49 @@ function callSendAPI(sender_psid, response) {
   // Send the HTTP request to the Messenger Platform
   axios.post(url, request_body);
 }
+
+const fetchGeneric = (data = []) => {
+  let output = [];
+  let len = data.length;
+
+  for (let i = 0; i < len; i++) {
+    output.push({
+      title: data[i].ten_chinh,
+      image_url: `${PAGE_URL}/upload/phim/${data[i].anh_poster}`,
+      buttons: [
+        {
+          type: "web_url",
+          url: `${PAGE_URL}/movie/${data[i].slug}`,
+          title: "Xem chi tiết",
+        },
+        {
+          type: "postback",
+          title: "Xem phim khác",
+          payload: "get_started",
+        },
+      ],
+    });
+  }
+
+  return output;
+};
+
+const callerAPI = async (url, method = "GET", data = {}) => {
+  return new Promise((reslove, reject) => {
+    axios({
+      method: method,
+      url: url,
+      data: data,
+      responseType: "json",
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then((res) => {
+        reslove(res);
+      })
+      .catch((err) => {
+        reject(err.response);
+      });
+  });
+};
