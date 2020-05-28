@@ -148,6 +148,8 @@ function handlePostback(sender_psid, received_postback) {
 
   if (payload === "get_new_film") {
     const url = `${PAGE_URL}/api/phim/new`;
+    console.log(url);
+    
     const { data, status } = await callerAPI(url);
     if (data && status === 200) {
       if (data.length > 0) {
